@@ -7,6 +7,8 @@ import 'dart:convert';
 String secret_key_dev = "DEV2FBC989549F4A740E49122250C4B1D720EB8E";
 String url = 'https://open-api.kakaopay.com/online/v1/payment/ready';
 
+String? url_temp;
+
 // 요청 헤더
 Map<String, String> requestHeaders = {
   'Authorization': 'SECRET_KEY $secret_key_dev',
@@ -41,10 +43,20 @@ Future<String> postKakao() async {
   //응답 처리
   if (response.statusCode == 200) {
     map_obj = jsonDecode(response.body);
-    String url = map_obj['next_redirect_mobile_url'];
+    String url = map_obj['next_redirect_pc_url'];
     return url;
   } else {
     print('Failed to post data: ${response.statusCode}');
     return "none";
   }
 }
+
+  // Future<void> onClicked() async {
+  //   String url = await postKakao();
+  //   if (url == "none") return;
+  //   if (await canLaunchUrl(Uri.parse(url))) {
+  //     await launchUrl(Uri.parse(url));
+  //   } else
+  //     print("no launch url");
+  // }
+
