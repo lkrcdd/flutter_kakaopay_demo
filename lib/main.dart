@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'backend.dart';
 import 'dart:async';
+import 'package:provider/provider.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(ChangeNotifierProvider(
+    create: (context) => PayInfo(),
+    child: MyApp(),
+  ));
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: const HomePage());
+    return const MaterialApp(home: HomePage());
   }
 }
 
@@ -22,19 +28,36 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Future<void> onClicked() async {
-    url_temp = await postKakao();
-    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
-      return WebViewPage();
-    }));
+    await postKakaoForReady();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (BuildContext context) {
+        return WebViewPage();
+      }),
+    );
+  }
+
+  Future<void> onClickedv2() async {
+    await postKakaoForApprove();
   }
 
   @override
   Widget build(BuildContext context) {
+    String tid = context.watch<PayInfo>().getTid;
+    String pgToken = context.watch<PayInfo>().getPgToken;
     return Scaffold(
-      body: ElevatedButton(
-        onPressed: onClicked,
-        child: const Text("press"),
-      ),
+      body: Column(children: [
+        ElevatedButton(
+          onPressed: onClicked,
+          child: const Text("send ready"),
+        ),
+        ElevatedButton(
+          onPressed: onClickedv2,
+          child: const Text("send approve"),
+        ),
+        Text("tid : $tid"),
+        Text("token : $pgToken"),
+      ]),
     );
   }
 }
@@ -48,6 +71,7 @@ class WebViewPage extends StatefulWidget {
 
 class _WebViewPageState extends State<WebViewPage> {
   late WebViewController _webViewController;
+  PayInfo payInfo = PayInfo();
 
   @override
   void initState() {
@@ -63,7 +87,10 @@ class _WebViewPageState extends State<WebViewPage> {
           debugPrint('[[[log]]] Page started loading: $url');
         },
         onPageFinished: (String url) {
-          url_temp = url;
+          urlForConvert = url;
+          getPgTokenFromUrl();
+          print("[[[log]]] tid : $tempTid");
+          print("[[[log]]] pgToken : $tempPgToken");
           debugPrint('[[[log]]] Page finished loading: $url');
         },
         onWebResourceError: (WebResourceError error) {},
@@ -75,7 +102,7 @@ class _WebViewPageState extends State<WebViewPage> {
         },
       ),
     );
-    _webViewController.loadRequest(Uri.parse(url_temp!));
+    _webViewController.loadRequest(Uri.parse(tempUrl!));
     super.initState();
   }
 

@@ -72,3 +72,8 @@ Redirect시 approval_url에 쿼리스트링(Query string)으로 pg_token을 전�
 
 ### 개발도구
 REST API in flutter
+
+ready 시
+모바일 웹 환경 : 실패 리다이렉트? -> 웹뷰 중복? or 카톡앱이없어서?
+웹 환경 : qr나옴 -> 테스트 진행
+모바일 앱 환경 : 실패 리다이렉트 -> 카톡앱이 없어서 그런듯?
